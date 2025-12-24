@@ -6,7 +6,6 @@ body {
     color: #333;
 }
 
-/* Header Style */
 .header {
     background: linear-gradient(to bottom, #ffffff 0%, #e5e5e5 100%);
     padding: 15px 20px;
@@ -23,10 +22,9 @@ body {
     font-style: italic
 }
 
-/* Area Tombol Kontrol Utama (Tidak ikut di-print) */
 .control-bar {
     display: flex;
-    justify-content: space-between; /* Memisahkan elemen ke ujung kiri dan kanan */
+    justify-content: space-between;
     align-items: center;
     padding: 10px 20px 0;
 }
@@ -34,7 +32,7 @@ body {
 .export-group {
     display: flex;
     align-items: center;
-    gap: 5px; /* Jarak antar tombol export */
+    gap: 5px;
 }
 
 .export-group label {
@@ -45,11 +43,10 @@ body {
 }
 
 .export-group input[type="checkbox"] {
-    width: auto; /* Agar tidak mengikuti style input lebar 100% */
+    width: auto;
     cursor: pointer;
 }
 
-/* Main Content */
 .container {
     max-width: 1000px;
     margin: 20px auto;
@@ -67,7 +64,6 @@ body {
     font-size: 18px;
 }
 
-/* --- UPDATE INFO BOX (Supaya Rapi) --- */
 .info-box {
     background-color: #eee;
     padding: 15px;
@@ -75,11 +71,10 @@ body {
     border: 1px solid #ddd;
     font-size: 14px;
     
-    /* Flexbox settings */
     display: flex;
     align-items: center;
     flex-wrap: wrap; 
-    gap: 30px; /* Jarak antar grup input */
+    gap: 30px;
 }
 
 .input-group {
@@ -91,7 +86,7 @@ body {
 .info-box label {
     font-weight: bold;
     margin-right: 10px;
-    white-space: nowrap; /* Tambahkan ini agar teks tidak pecah ke bawah */
+    white-space: nowrap;
 }
 
 .name-input {
@@ -103,7 +98,6 @@ body {
     background: transparent;
 }
 
-/* Table Styling */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -126,7 +120,6 @@ th {
     text-align: center;
 }
 
-/* Input Styling inside table */
 input[type="text"], input[type="number"], select {
     width: 100%;
     padding: 6px;
@@ -136,7 +129,6 @@ input[type="text"], input[type="number"], select {
     border-radius: 3px;
 }
 
-/* Print Mode Styling */
 .print-mode input, .print-mode select {
     border: none;
     background: transparent;
@@ -146,7 +138,6 @@ input[type="text"], input[type="number"], select {
     text-align: center;
 }
 
-/* Summary Section */
 .summary-table {
     width: 35%;
     margin-left: auto;
@@ -162,7 +153,6 @@ input[type="text"], input[type="number"], select {
     font-weight: bold;
 }
 
-/* Buttons */
 .btn {
     padding: 8px 15px;
     border: none;
@@ -178,18 +168,15 @@ input[type="text"], input[type="number"], select {
 .btn-del { background-color: #dc3545; color: white; padding: 4px 10px; }
 .btn-reset { background-color: #dc3545; color: white; font-size: 12px; }
 
-/* Tombol Download */
 .btn-pdf { background-color: #dc3545; color: white; } 
 .btn-png { background-color: #17a2b8; color: white; }
 
-/* History Section */
 .history-section {
     margin-top: 30px;
     padding-top: 20px;
     border-top: 2px dashed #ccc;
 }
 
-/* --- RESPONSIVE DESIGN --- */
 @media screen and (max-width: 600px) {
     .container {
         margin: 10px;
@@ -201,14 +188,13 @@ input[type="text"], input[type="number"], select {
     }
 
     .input-group, .name-input {
-        width: 100%; /* Inputan melebar penuh di layar kecil */
+        width: 100%;
     }
 
     .summary-table {
-        width: 100%; /* Tabel IPS/IPK jadi lebar penuh di HP */
+        width: 100%;
     }
 
-    /* Tabel utama agar bisa di-scroll secara horizontal jika kolom terlalu banyak */
     #nilaiTable {
         display: block;
         overflow-x: auto;
@@ -216,7 +202,6 @@ input[type="text"], input[type="number"], select {
     }
 }
 
-/* Styling tautan footer */
 .footer-link {
     text-decoration: none;
     color: #4a8bc2;
@@ -225,22 +210,19 @@ input[type="text"], input[type="number"], select {
 }
 
 .footer-link:hover {
-    color: #333; /* Warna berubah saat kursor di atasnya */
+    color: #333;
 }
 
 .footer-link i {
-    margin-right: 5px; /* Jarak antara ikon dan teks */
+    margin-right: 5px;
 }
 
-/* Kode ini hanya aktif saat user mencetak atau menyimpan sebagai PDF */
 @media print {
-    /* 1. Paksa browser menampilkan warna latar belakang dan elemen grafik */
     * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
-    /* 2. Sembunyikan elemen yang tidak perlu dicetak */
     .header, 
     .control-bar, 
     #btnAddRow, 
@@ -250,7 +232,6 @@ input[type="text"], input[type="number"], select {
         display: none !important;
     }
 
-    /* 3. Pastikan Container melebar penuh tanpa shadow */
     .container {
         box-shadow: none !important;
         margin: 0 !important;
@@ -260,23 +241,20 @@ input[type="text"], input[type="number"], select {
         border-top: none !important;
     }
 
-    /* 4. Pertegas Border Tabel agar tidak hilang/samar */
     table, th, td {
-        border: 1px solid #000 !important; /* Gunakan hitam pekat agar tajam di PDF */
+        border: 1px solid #000 !important;
     }
 
     th {
-        background-color: #e0e0e0 !important; /* Paksa warna header tabel muncul */
+        background-color: #e0e0e0 !important;
     }
 
-    /* 5. Atur tampilan input agar terlihat bersih tapi tetap rapi */
     input, select {
         border: none !important;
         background: transparent !important;
         color: #000 !important;
     }
 
-    /* Menghilangkan header/footer otomatis dari browser (seperti URL dan Tanggal di pojok) */
     @page {
         margin: 1cm;
     }
@@ -291,13 +269,11 @@ input[type="text"], input[type="number"], select {
     width: 100%; 
     height: 100%; 
     background-color: rgba(0,0,0,0.5); 
-    /* TAMBAHKAN INI: Agar modal bisa di-scroll jika konten kepanjangan */
     overflow-y: auto; 
 }
 
 .modal-content {
     background-color: #fefefe;
-    /* UBAH INI: Perkecil margin agar ruang konten lebih luas */
     margin: 5% auto; 
     padding: 20px;
     border: 1px solid #888;
@@ -305,7 +281,6 @@ input[type="text"], input[type="number"], select {
     max-width: 600px;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    /* TAMBAHKAN INI: Memastikan konten tidak terpotong di bawah */
     margin-bottom: 50px; 
 }
 
@@ -332,7 +307,6 @@ input[type="text"], input[type="number"], select {
     margin-top: 0;
 }
 
-/* Tombol Panduan di Navbar/Control Bar */
 .btn-guide {
     background-color: #f39c12;
     color: white;
