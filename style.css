@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -183,12 +187,40 @@ input[type="text"], input[type="number"], select {
         padding: 15px;
     }
 
+    .control-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 10px;
+    }
+
+    .export-group {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
     .info-box {
+        flex-direction: column;
+        align-items: flex-start;
         gap: 15px;
     }
 
-    .input-group, .name-input {
+    .input-group {
         width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .info-box label {
+        min-width: unset;
+        margin-right: 0;
+    }
+
+    .name-input {
+        width: 100% !important;
     }
 
     .summary-table {
@@ -198,7 +230,7 @@ input[type="text"], input[type="number"], select {
     #nilaiTable {
         display: block;
         overflow-x: auto;
-        white-space: nowrap;
+        width: 100%;
     }
 }
 
