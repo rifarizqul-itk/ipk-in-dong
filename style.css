@@ -1,0 +1,170 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Header Style */
+.header {
+    background: linear-gradient(to bottom, #ffffff 0%, #e5e5e5 100%);
+    padding: 15px 20px;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header h1 {
+    color: #4a8bc2;
+    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+    font-style: italic
+}
+
+/* Area Tombol Kontrol Utama (Tidak ikut di-print) */
+.control-bar {
+    text-align: right;
+    padding: 10px 20px 0;
+}
+
+/* Main Content */
+.container {
+    max-width: 1000px;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    border-top: 4px solid #4a8bc2;
+}
+
+.section-title {
+    text-align: center;
+    color: #007bff;
+    margin-bottom: 20px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* --- UPDATE INFO BOX (Supaya Rapi) --- */
+.info-box {
+    background-color: #eee;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    
+    /* Flexbox settings */
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; 
+    gap: 30px; /* Jarak antar grup input */
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.info-box label {
+    font-weight: bold;
+    margin-right: 10px;
+    white-space: nowrap; /* Tambahkan ini agar teks tidak pecah ke bawah */
+}
+
+.name-input {
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    font-size: 14px;
+    width: 200px;
+    border-radius: 3px;
+    background: transparent;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+thead {
+    background-color: #e0e0e0;
+    font-weight: bold;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    text-align: center;
+}
+
+/* Input Styling inside table */
+input[type="text"], input[type="number"], select {
+    width: 100%;
+    padding: 6px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    font-size: 13px;
+    border-radius: 3px;
+}
+
+/* Print Mode Styling */
+.print-mode input, .print-mode select {
+    border: none;
+    background: transparent;
+}
+
+.sks-input, .sn-input {
+    text-align: center;
+}
+
+/* Summary Section */
+.summary-table {
+    width: 35%;
+    margin-left: auto;
+    background-color: #f9f9f9;
+}
+.summary-label {
+    text-align: right;
+    font-weight: bold;
+    background-color: #e0e0e0;
+}
+.summary-value {
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Buttons */
+.btn {
+    padding: 8px 15px;
+    border: none;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 13px;
+    margin-right: 5px;
+    transition: 0.2s;
+    font-weight: bold;
+}
+.btn:hover { opacity: 0.9; transform: scale(1.02); }
+.btn-add { background-color: #28a745; color: white; }
+.btn-del { background-color: #dc3545; color: white; padding: 4px 10px; }
+.btn-reset { background-color: #dc3545; color: white; font-size: 12px; }
+
+/* Tombol Download */
+.btn-pdf { background-color: #dc3545; color: white; } 
+.btn-png { background-color: #17a2b8; color: white; }
+
+/* History Section */
+.history-section {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px dashed #ccc;
+}

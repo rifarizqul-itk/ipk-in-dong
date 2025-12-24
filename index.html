@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIAKAD - Simulasi Hitung IPS & IPK</title>
+    
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+<body>
+
+    <div class="header">
+        <h1>IPK-in dong!</h1>
+        <button class="btn btn-reset" onclick="resetAll()">Reset Data</button>
+    </div>
+
+    <div class="control-bar">
+        <span>Export Hasil: </span>
+        <button class="btn btn-pdf" onclick="downloadPDF()">PDF</button>
+        <button class="btn btn-png" onclick="downloadPNG()">Gambar (PNG)</button>
+    </div>
+
+    <div class="container" id="printableArea">
+        <div class="section-title">Hitung Estimasi IPS (Indeks Prestasi Semester)</div>
+        
+        <div class="info-box">
+            <div class="input-group">
+                <label>Mahasiswa :</label>
+                <input type="text" class="name-input" id="namaMahasiswa" placeholder="Ketik nama kamu...">
+            </div>
+            
+            <div class="input-group">
+                <label>Semester :</label>
+                <input type="text" class="name-input" id="semesterMahasiswa" placeholder="Cth: 5">
+            </div>
+        </div>
+
+        <table id="nilaiTable">
+            <thead>
+                <tr>
+                    <th style="width: 15%;">Kode MK</th>
+                    <th style="width: 40%;">Mata Kuliah</th>
+                    <th style="width: 10%;">SKS</th>
+                    <th style="width: 15%;">N. Huruf</th>
+                    <th style="width: 10%;">S*N</th>
+                    <th style="width: 5%;" class="aksi-col">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+
+        <button class="btn btn-add" id="btnAddRow" data-html2canvas-ignore="true" onclick="addRow()">+ Tambah Mata Kuliah</button>
+        <br><br>
+
+        <table class="summary-table">
+            <tr>
+                <td class="summary-label">Jumlah SKS Semester Ini</td>
+                <td class="summary-value" id="totalSKS">0</td>
+            </tr>
+            <tr>
+                <td class="summary-label">IPS</td>
+                <td class="summary-value" id="totalIPS">0.00</td>
+            </tr>
+        </table>
+
+        <div class="history-section">
+            <h3>Hitung Estimasi IPK (Indeks Prestasi Kumulatif)</h3>
+            <p id="helperText" style="font-size: 12px; color: #666;" data-html2canvas-ignore="true">
+                Isi bagian ini jika kamu ingin menggabungkan nilai semester ini dengan semester sebelumnya.
+            </p>
+            
+            <table style="width: 60%;">
+                <tr>
+                    <td style="background-color: #f0f0f0; width: 60%;">Total SKS Semester Lalu</td>
+                    <td><input type="number" id="prevSKS" placeholder="Cth: 80" oninput="calculate()"></td>
+                </tr>
+                <tr>
+                    <td style="background-color: #f0f0f0;">IPK Terakhir</td>
+                    <td><input type="number" step="0.01" id="prevIPK" placeholder="Cth: 3.50" oninput="calculate()"></td>
+                </tr>
+            </table>
+
+            <table class="summary-table" style="margin-top: 10px;">
+                <tr>
+                    <td class="summary-label" style="background-color: #4a8bc2; color: white; font-size: 20px;">IPK</td>
+                    <td class="summary-value" id="finalIPK" style="font-size: 20px; color: #4a8bc2;">0.00</td>
+                </tr>
+            </table>
+        </div>
+        
+        <div style="margin-top: 30px; font-size: 10px; color: #999; text-align: center;">
+            Dicetak dari Simulasi Siakad pada: <span id="printDate"></span>
+        </div>
+    </div>
+
+    <script>
+        const gradeValues = { "A": 4.0, "AB": 3.5, "B": 3.0, "BC": 2.5, "C": 2.0, "D": 1.0, "E": 0.0 };
+
+        function addRow() {
+            const table = document.getElementById("nilaiTable").getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+
+            let cell1 = newRow.insertCell(0);
+            cell1.innerHTML = '<input type="text" placeholder="Kode MK">';
+
+            let cell2 = newRow.insertCell(1);
+            cell2.innerHTML = '<input type="text" placeholder="Nama Mata Kuliah">';
+
+            let cell3 = newRow.insertCell(2);
+            cell3.innerHTML = '<input type="number" class="sks-input" value="3" min="1" oninput="calculateRow(this)">';
+
+            let cell4 = newRow.insertCell(3);
+            let selectHTML = '<select onchange="calculateRow(this)">';
+            selectHTML += '<option value="">- Pilih -</option>';
+            for (let grade in gradeValues) {
+                selectHTML += `<option value="${grade}">${grade}</option>`;
+            }
+            selectHTML += '</select>';
+            cell4.innerHTML = selectHTML;
+
+            let cell5 = newRow.insertCell(4);
+            cell5.innerHTML = '<input type="text" class="sn-input" readonly value="0">';
+
+            let cell6 = newRow.insertCell(5);
+            cell6.className = "aksi-col";
+            cell6.innerHTML = '<button class="btn btn-del" onclick="removeRow(this)">X</button>';
+            
+            calculate();
+        }
+
+        function removeRow(btn) {
+            var row = btn.parentNode.parentNode;
+            row.parentNode.removeChild(row);
+            calculate();
+        }
+
+        function calculateRow(element) {
+            let row = element.closest('tr');
+            let sksInput = row.querySelector('.sks-input');
+            let gradeSelect = row.querySelector('select');
+            let snInput = row.querySelector('.sn-input');
+
+            let sks = parseFloat(sksInput.value) || 0;
+            let gradeLetter = gradeSelect.value;
+            let gradePoint = gradeValues[gradeLetter] || 0;
+            let sn = sks * gradePoint;
+            
+            if (gradeLetter !== "") snInput.value = sn.toFixed(1);
+            else snInput.value = "0";
+            
+            calculate();
+        }
+
+        function calculate() {
+            let table = document.getElementById("nilaiTable").getElementsByTagName('tbody')[0];
+            let rows = table.rows;
+            let currentTotalSKS = 0;
+            let currentTotalSN = 0;
+
+            for (let i = 0; i < rows.length; i++) {
+                let sksInput = rows[i].querySelector('.sks-input');
+                let snInput = rows[i].querySelector('.sn-input');
+                let sks = parseFloat(sksInput.value) || 0;
+                let sn = parseFloat(snInput.value) || 0;
+                if(sks > 0) {
+                    currentTotalSKS += sks;
+                    currentTotalSN += sn;
+                }
+            }
+
+            document.getElementById("totalSKS").innerText = currentTotalSKS;
+            let ips = 0;
+            if (currentTotalSKS > 0) ips = currentTotalSN / currentTotalSKS;
+            document.getElementById("totalIPS").innerText = ips.toFixed(2);
+
+            let prevSKS = parseFloat(document.getElementById("prevSKS").value) || 0;
+            let prevIPK = parseFloat(document.getElementById("prevIPK").value) || 0;
+            let prevTotalSN = prevSKS * prevIPK;
+            let finalTotalSKS = prevSKS + currentTotalSKS;
+            let finalTotalSN = prevTotalSN + currentTotalSN;
+            let finalIPK = 0;
+            if (finalTotalSKS > 0) finalIPK = finalTotalSN / finalTotalSKS;
+
+            document.getElementById("finalIPK").innerText = finalIPK.toFixed(2);
+        }
+
+        function resetAll() {
+            if(confirm("Yakin reset data?")) {
+                document.getElementById("namaMahasiswa").value = "";
+                document.getElementById("semesterMahasiswa").value = ""; // Update: Reset semester juga
+                document.getElementById("prevSKS").value = "";
+                document.getElementById("prevIPK").value = "";
+                document.getElementById("nilaiTable").getElementsByTagName('tbody')[0].innerHTML = "";
+                addRow(); addRow(); addRow();
+            }
+        }
+
+        // --- Export Logic ---
+        function prepareForExport(isExporting) {
+            const container = document.getElementById('printableArea');
+            const aksiCols = document.querySelectorAll('.aksi-col');
+            const dateSpan = document.getElementById('printDate');
+            
+            if (isExporting) {
+                aksiCols.forEach(el => el.style.display = 'none');
+                container.classList.add('print-mode');
+                dateSpan.innerText = new Date().toLocaleString('id-ID');
+            } else {
+                aksiCols.forEach(el => el.style.display = '');
+                container.classList.remove('print-mode');
+                dateSpan.innerText = "";
+            }
+        }
+
+        function downloadPDF() {
+            prepareForExport(true);
+            const element = document.getElementById('printableArea');
+            const opt = {
+                margin: 10,
+                filename: 'Simulasi_KHS_' + (document.getElementById("namaMahasiswa").value || 'Mahasiswa') + '.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save().then(() => prepareForExport(false));
+        }
+
+        function downloadPNG() {
+            prepareForExport(true);
+            const element = document.getElementById('printableArea');
+            html2canvas(element, { scale: 2 }).then(canvas => {
+                let link = document.createElement('a');
+                link.download = 'Simulasi_KHS_' + (document.getElementById("namaMahasiswa").value || 'Mahasiswa') + '.png';
+                link.href = canvas.toDataURL();
+                link.click();
+                prepareForExport(false);
+            });
+        }
+
+        window.onload = function() {
+            addRow(); addRow(); addRow();
+        };
+    </script>
+</body>
+</html>
