@@ -35,8 +35,18 @@ body {
 
 .export-group {
     display: flex;
+    justify-content: flex-end; /* Tetap di kanan pada desktop */
     align-items: center;
-    gap: 5px;
+    flex-wrap: wrap; /* Izinkan pindah baris pada HP */
+    gap: 15px;
+}
+
+/* Memastikan teks dan tombol di dalam grup tetap menyatu */
+.export-sub-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap; /* Mencegah teks pecah di tengah-tengah grup */
 }
 
 .export-group label {
@@ -182,6 +192,11 @@ input[type="text"], input[type="number"], select {
 }
 
 @media screen and (max-width: 600px) {
+    .export-group {
+        justify-content: center; /* Rata tengah pada HP */
+        gap: 10px;
+    }
+
     .container {
         margin: 10px;
         padding: 15px;
@@ -260,7 +275,9 @@ input[type="text"], input[type="number"], select {
     #btnAddRow, 
     .btn-reset,
     .aksi-col,
-    .btn-guide {
+    .btn-guide,
+    .app-footer,
+    #helperText { 
         display: none !important;
     }
 

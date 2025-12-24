@@ -21,13 +21,17 @@
         <button class="btn btn-guide" onclick="toggleGuide(true)">Panduan Penggunaan</button>
         
         <div class="export-group">
-            <span style="font-size: 13px; font-weight: bold;">Sertakan dalam ekspor:</span>
-            <label style="font-size: 13px; cursor: pointer;"><input type="checkbox" id="includeIPS" checked> IPS</label>
-            <label style="font-size: 13px; cursor: pointer; margin-right: 15px;"><input type="checkbox" id="includeIPK" checked> IPK</label>
+            <div class="export-sub-group">
+                <span style="font-size: 13px; font-weight: bold;">Sertakan dalam ekspor:</span>
+                <label style="font-size: 13px; cursor: pointer;"><input type="checkbox" id="includeIPS" checked> IPS</label>
+                <label style="font-size: 13px; cursor: pointer; margin-right: 15px;"><input type="checkbox" id="includeIPK" checked> IPK</label>
+            </div>
             
-            <span>Export: </span>
-            <button class="btn btn-pdf" onclick="downloadPDF()">PDF</button>
-            <button class="btn btn-png" onclick="downloadPNG()">PNG</button>
+            <div class="export-sub-group">
+                <span style="font-size: 13px; font-weight: bold;">Export: </span>
+                <button class="btn btn-pdf" onclick="downloadPDF()">PDF</button>
+                <button class="btn btn-png" onclick="downloadPNG()">PNG</button>
+            </div>
         </div>
     </div>
 
@@ -356,7 +360,7 @@
             const nama = document.getElementById("namaMahasiswa").value || 'Mahasiswa';
             html2canvas(document.getElementById('printableArea'), { scale: 2 }).then(canvas => {
                 let link = document.createElement('a');
-                link.download = `Simulasi_KHS_${nama}_${getTimestamp()}.png`;
+                link.download = `IPKin_dong_${nama}_${getTimestamp()}.png`;
                 link.href = canvas.toDataURL();
                 link.click();
                 prepareForExport(false);
