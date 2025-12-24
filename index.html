@@ -195,7 +195,6 @@
         function loadData() {
             const savedData = localStorage.getItem('ipk_in_dong_data');
             if (!savedData) {
-                // Jika data kosong, beri 3 baris default
                 addRow(); addRow(); addRow();
                 return;
             }
@@ -207,21 +206,24 @@
             document.getElementById("prevIPK").value = data.prevIPK || "";
 
             const tbody = document.getElementById("nilaiTable").getElementsByTagName('tbody')[0];
-            tbody.innerHTML = ""; // Bersihkan baris lama
+            tbody.innerHTML = ""; 
 
             if (data.courses && data.courses.length > 0) {
                 data.courses.forEach(c => {
-                    const mataKuliah = c.nama || c.kode || ""; // Backward compatibility: isi nama dengan kode jika ada
-                    addRow(mataKuliah, c.sks, c.grade);
+                    const mataKuliah = c.nama || c.kode || "";
+                    // Tambahkan parameter 'false' agar tidak menghitung/menyimpan berulang kali
+                    addRow(mataKuliah, c.sks, c.grade, false); 
                 });
             } else {
                 addRow(); addRow(); addRow();
             }
-            calculate();
+            // Hitung total keseluruhan hanya SEKALI di akhir pemuatan data
+            calculate(); 
         }
 
         // --- LOGIKA UTAMA ---
-        function addRow(nama = "", sks = 3, grade = "") {
+        // Tambahkan parameter 'shouldCalculate' dengan nilai default 'true'
+        function addRow(nama = "", sks = 3, grade = "", shouldCalculate = true) {
             const table = document.getElementById("nilaiTable").getElementsByTagName('tbody')[0];
             const newRow = table.insertRow();
 
@@ -237,13 +239,22 @@
             selectHTML += `</select>`;
             newRow.insertCell(2).innerHTML = selectHTML;
 
-            newRow.insertCell(3).innerHTML = `<input type="text" class="sn-input" readonly value="0">`;
+            // Hitung S*N individual untuk baris ini agar langsung tampil saat load
+            let gradePoint = gradeValues[grade] || 0;
+            let sn = sks * gradePoint;
+            let snValue = (grade !== "") ? sn.toFixed(1) : "0";
+
+            newRow.insertCell(3).innerHTML = `<input type="text" class="sn-input" readonly value="${snValue}">`;
             
             let cellAksi = newRow.insertCell(4);
             cellAksi.className = "aksi-col";
             cellAksi.innerHTML = `<button class="btn btn-del" onclick="removeRow(this)">X</button>`;
             
-            calculateRow(newRow.querySelector('.sks-input')); // Hitung SN baris tersebut
+            // Hanya lakukan kalkulasi total dan simpan ke memori jika BUKAN sedang load data
+            if (shouldCalculate) {
+                calculate();
+                saveData();
+            }
         }
 
         function removeRow(btn) {
