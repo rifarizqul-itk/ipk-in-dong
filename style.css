@@ -216,6 +216,22 @@ input[type="text"], input[type="number"], select {
     }
 }
 
+/* Styling tautan footer */
+.footer-link {
+    text-decoration: none;
+    color: #4a8bc2;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.footer-link:hover {
+    color: #333; /* Warna berubah saat kursor di atasnya */
+}
+
+.footer-link i {
+    margin-right: 5px; /* Jarak antara ikon dan teks */
+}
+
 /* Kode ini hanya aktif saat user mencetak atau menyimpan sebagai PDF */
 @media print {
     /* 1. Paksa browser menampilkan warna latar belakang dan elemen grafik */
@@ -266,7 +282,6 @@ input[type="text"], input[type="number"], select {
     }
 }
 
-/* --- MODAL GUIDE --- */
 .modal {
     display: none; 
     position: fixed; 
@@ -276,17 +291,22 @@ input[type="text"], input[type="number"], select {
     width: 100%; 
     height: 100%; 
     background-color: rgba(0,0,0,0.5); 
+    /* TAMBAHKAN INI: Agar modal bisa di-scroll jika konten kepanjangan */
+    overflow-y: auto; 
 }
 
 .modal-content {
     background-color: #fefefe;
-    margin: 10% auto;
+    /* UBAH INI: Perkecil margin agar ruang konten lebih luas */
+    margin: 5% auto; 
     padding: 20px;
     border: 1px solid #888;
-    width: 80%;
+    width: 85%;
     max-width: 600px;
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    /* TAMBAHKAN INI: Memastikan konten tidak terpotong di bawah */
+    margin-bottom: 50px; 
 }
 
 .close-guide {

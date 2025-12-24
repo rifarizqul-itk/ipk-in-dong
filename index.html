@@ -6,6 +6,7 @@
     <title>IPK-in dong!</title>
     
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
@@ -101,12 +102,24 @@
         <div style="margin-top: 30px; font-size: 10px; color: #999; text-align: center;">
             Dicetak dari <i>IPK-in dong!</i> pada: <span id="printDate"></span>
         </div>
+
+        <div class="app-footer" data-html2canvas-ignore="true">
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+            <div style="display: flex; justify-content: center; gap: 30px; font-size: 14px;">
+                <a href="https://github.com/rifarizqul-itk/ipk-in-dong" target="_blank" class="footer-link">
+                    <i class="fa-brands fa-github"></i> GitHub
+                </a>
+                <a href="mailto:10241050@student.itk.ac.id" class="footer-link">
+                    <i class="fa-solid fa-envelope"></i> E-mail
+                </a>
+            </div>
+        </div>
     </div>
 
     <div id="guideModal" class="modal">
         <div class="modal-content">
             <span class="close-guide" onclick="toggleGuide(false)">&times;</span>
-            <h2 style="color: #4a8bc2;">Panduan IPK-in dong!</h2>
+            <h2 style="color: #4a8bc2;">Panduan <i>IPK-in dong!</i></h2>
             <div class="guide-body">
                 <h4>Apa itu SKS?</h4>
                 <p>Satuan Kredit Semester (SKS) adalah bobot beban studi tiap mata kuliah. Biasanya berkisar antara 2 sampai 4 SKS.</p>
@@ -119,6 +132,15 @@
                 
                 <h4>Apa bedanya dengan IPK?</h4>
                 <p>IPK (Indeks Prestasi Kumulatif) adalah rata-rata gabungan dari seluruh semester yang telah ditempuh. Di web ini, kamu bisa memasukkan data semester lalu untuk melihat proyeksi nilai akhirmu.</p>
+
+                <h4>Data Saya Aman?</h4>
+                <p>Sangat aman. Web ini menggunakan fitur <b>Local Storage</b>. Semua data yang kamu ketik hanya tersimpan di memori browser perangkatmu sendiri, tidak dikirim ke server mana pun.</p>
+                
+                <h4>Fitur Ekspor</h4>
+                <p>Kamu bisa memilih untuk mengunduh hasil hitungan dalam bentuk <b>PDF</b> atau <b>PNG</b> (gambar). Gunakan checkbox di bagian atas untuk memilih bagian mana (IPS atau IPK) yang ingin kamu sertakan dalam dokumen.</p>
+                
+                <h4>Cara Reset</h4>
+                <p>Jika ingin menghapus semua data dan mulai dari awal, cukup klik tombol <b>Reset Data</b> di pojok kanan atas.</p>
             </div>
         </div>
     </div>
@@ -128,13 +150,21 @@
 
         function toggleGuide(show) {
             document.getElementById("guideModal").style.display = show ? "block" : "none";
+            
+            // Mencegah scroll pada halaman utama (background) saat modal terbuka
+            if (show) {
+                document.body.style.overflow = "hidden";
+            } else {
+                document.body.style.overflow = "auto";
+            }
         }
 
-        // Menutup modal jika user klik di luar kotak modal
+        // Pastikan fungsi tutup modal via klik di luar juga mengembalikan scroll body
         window.onclick = function(event) {
             const modal = document.getElementById("guideModal");
             if (event.target == modal) {
                 modal.style.display = "none";
+                document.body.style.overflow = "auto"; // Tambahkan ini
             }
         }
 
