@@ -7,7 +7,6 @@
     
     <link rel="stylesheet" href="style.css">
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 <body>
@@ -100,72 +99,113 @@
     <script>
         const gradeValues = { "A": 4.0, "AB": 3.5, "B": 3.0, "BC": 2.5, "C": 2.0, "D": 1.0, "E": 0.0 };
 
-        function addRow() {
+        // --- FUNGSI LOCAL STORAGE ---
+        function saveData() {
+            const rows = document.getElementById("nilaiTable").getElementsByTagName('tbody')[0].rows;
+            const courses = [];
+
+            for (let i = 0; i < rows.length; i++) {
+                courses.push({
+                    kode: rows[i].cells[0].querySelector('input').value,
+                    nama: rows[i].cells[1].querySelector('input').value,
+                    sks: rows[i].cells[2].querySelector('input').value,
+                    grade: rows[i].cells[3].querySelector('select').value
+                });
+            }
+
+            const data = {
+                nama: document.getElementById("namaMahasiswa").value,
+                semester: document.getElementById("semesterMahasiswa").value,
+                prevSKS: document.getElementById("prevSKS").value,
+                prevIPK: document.getElementById("prevIPK").value,
+                courses: courses
+            };
+
+            localStorage.setItem('ipk_in_dong_data', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const savedData = localStorage.getItem('ipk_in_dong_data');
+            if (!savedData) {
+                // Jika data kosong, beri 3 baris default
+                addRow(); addRow(); addRow();
+                return;
+            }
+
+            const data = JSON.parse(savedData);
+            document.getElementById("namaMahasiswa").value = data.nama || "";
+            document.getElementById("semesterMahasiswa").value = data.semester || "";
+            document.getElementById("prevSKS").value = data.prevSKS || "";
+            document.getElementById("prevIPK").value = data.prevIPK || "";
+
+            const tbody = document.getElementById("nilaiTable").getElementsByTagName('tbody')[0];
+            tbody.innerHTML = ""; // Bersihkan baris lama
+
+            if (data.courses && data.courses.length > 0) {
+                data.courses.forEach(c => {
+                    addRow(c.kode, c.nama, c.sks, c.grade);
+                });
+            } else {
+                addRow(); addRow(); addRow();
+            }
+            calculate();
+        }
+
+        // --- LOGIKA UTAMA ---
+        function addRow(kode = "", nama = "", sks = 3, grade = "") {
             const table = document.getElementById("nilaiTable").getElementsByTagName('tbody')[0];
             const newRow = table.insertRow();
 
-            let cell1 = newRow.insertCell(0);
-            cell1.innerHTML = '<input type="text" placeholder="Kode MK">';
-
-            let cell2 = newRow.insertCell(1);
-            cell2.innerHTML = '<input type="text" placeholder="Nama Mata Kuliah">';
-
-            let cell3 = newRow.insertCell(2);
-            cell3.innerHTML = '<input type="number" class="sks-input" value="3" min="1" oninput="calculateRow(this)">';
-
-            let cell4 = newRow.insertCell(3);
-            let selectHTML = '<select onchange="calculateRow(this)">';
-            selectHTML += '<option value="">- Pilih -</option>';
-            for (let grade in gradeValues) {
-                selectHTML += `<option value="${grade}">${grade}</option>`;
-            }
-            selectHTML += '</select>';
-            cell4.innerHTML = selectHTML;
-
-            let cell5 = newRow.insertCell(4);
-            cell5.innerHTML = '<input type="text" class="sn-input" readonly value="0">';
-
-            let cell6 = newRow.insertCell(5);
-            cell6.className = "aksi-col";
-            cell6.innerHTML = '<button class="btn btn-del" onclick="removeRow(this)">X</button>';
+            newRow.insertCell(0).innerHTML = `<input type="text" placeholder="Kode MK" value="${kode}" oninput="saveData()">`;
+            newRow.insertCell(1).innerHTML = `<input type="text" placeholder="Nama Mata Kuliah" value="${nama}" oninput="saveData()">`;
+            newRow.insertCell(2).innerHTML = `<input type="number" class="sks-input" value="${sks}" min="1" oninput="calculateRow(this)">`;
             
-            calculate();
+            let selectHTML = `<select onchange="calculateRow(this)">`;
+            selectHTML += `<option value="">- Pilih -</option>`;
+            for (let g in gradeValues) {
+                const selected = (g === grade) ? "selected" : "";
+                selectHTML += `<option value="${g}" ${selected}>${g}</option>`;
+            }
+            selectHTML += `</select>`;
+            newRow.insertCell(3).innerHTML = selectHTML;
+
+            newRow.insertCell(4).innerHTML = `<input type="text" class="sn-input" readonly value="0">`;
+            
+            let cellAksi = newRow.insertCell(5);
+            cellAksi.className = "aksi-col";
+            cellAksi.innerHTML = `<button class="btn btn-del" onclick="removeRow(this)">X</button>`;
+            
+            calculateRow(newRow.querySelector('.sks-input')); // Hitung SN baris tersebut
         }
 
         function removeRow(btn) {
-            var row = btn.parentNode.parentNode;
-            row.parentNode.removeChild(row);
+            btn.closest('tr').remove();
             calculate();
+            saveData();
         }
 
         function calculateRow(element) {
+            if(!element) return;
             let row = element.closest('tr');
-            let sksInput = row.querySelector('.sks-input');
-            let gradeSelect = row.querySelector('select');
-            let snInput = row.querySelector('.sn-input');
-
-            let sks = parseFloat(sksInput.value) || 0;
-            let gradeLetter = gradeSelect.value;
+            let sks = parseFloat(row.querySelector('.sks-input').value) || 0;
+            let gradeLetter = row.querySelector('select').value;
             let gradePoint = gradeValues[gradeLetter] || 0;
             let sn = sks * gradePoint;
             
-            if (gradeLetter !== "") snInput.value = sn.toFixed(1);
-            else snInput.value = "0";
+            row.querySelector('.sn-input').value = (gradeLetter !== "") ? sn.toFixed(1) : "0";
             
             calculate();
+            saveData();
         }
 
         function calculate() {
-            let table = document.getElementById("nilaiTable").getElementsByTagName('tbody')[0];
-            let rows = table.rows;
+            let rows = document.getElementById("nilaiTable").getElementsByTagName('tbody')[0].rows;
             let currentTotalSKS = 0;
             let currentTotalSN = 0;
 
             for (let i = 0; i < rows.length; i++) {
-                let sksInput = rows[i].querySelector('.sks-input');
-                let snInput = rows[i].querySelector('.sn-input');
-                let sks = parseFloat(sksInput.value) || 0;
-                let sn = parseFloat(snInput.value) || 0;
+                let sks = parseFloat(rows[i].querySelector('.sks-input').value) || 0;
+                let sn = parseFloat(rows[i].querySelector('.sn-input').value) || 0;
                 if(sks > 0) {
                     currentTotalSKS += sks;
                     currentTotalSN += sn;
@@ -173,88 +213,60 @@
             }
 
             document.getElementById("totalSKS").innerText = currentTotalSKS;
-            let ips = 0;
-            if (currentTotalSKS > 0) ips = currentTotalSN / currentTotalSKS;
+            let ips = (currentTotalSKS > 0) ? currentTotalSN / currentTotalSKS : 0;
             document.getElementById("totalIPS").innerText = ips.toFixed(2);
 
             let prevSKS = parseFloat(document.getElementById("prevSKS").value) || 0;
             let prevIPK = parseFloat(document.getElementById("prevIPK").value) || 0;
-            let prevTotalSN = prevSKS * prevIPK;
             let finalTotalSKS = prevSKS + currentTotalSKS;
-            let finalTotalSN = prevTotalSN + currentTotalSN;
-            let finalIPK = 0;
-            if (finalTotalSKS > 0) finalIPK = finalTotalSN / finalTotalSKS;
+            let finalTotalSN = (prevSKS * prevIPK) + currentTotalSN;
+            let finalIPK = (finalTotalSKS > 0) ? finalTotalSN / finalTotalSKS : 0;
 
             document.getElementById("finalIPK").innerText = finalIPK.toFixed(2);
         }
 
         function resetAll() {
             if(confirm("Yakin reset data?")) {
-                document.getElementById("namaMahasiswa").value = "";
-                document.getElementById("semesterMahasiswa").value = ""; // Update: Reset semester juga
-                document.getElementById("prevSKS").value = "";
-                document.getElementById("prevIPK").value = "";
-                document.getElementById("nilaiTable").getElementsByTagName('tbody')[0].innerHTML = "";
-                addRow(); addRow(); addRow();
+                localStorage.removeItem('ipk_in_dong_data'); // Hapus memori browser
+                location.reload(); // Muat ulang halaman
             }
         }
 
-        // --- Export Logic ---
-        function prepareForExport(isExporting) {
-            const container = document.getElementById('printableArea');
-            const aksiCols = document.querySelectorAll('.aksi-col');
-            const dateSpan = document.getElementById('printDate');
-            
-            if (isExporting) {
-                aksiCols.forEach(el => el.style.display = 'none');
-                container.classList.add('print-mode');
-                dateSpan.innerText = new Date().toLocaleString('id-ID');
-            } else {
-                aksiCols.forEach(el => el.style.display = '');
-                container.classList.remove('print-mode');
-                dateSpan.innerText = "";
-            }
-        }
-
-        // --- Fungsi Pembantu untuk Mendapatkan Waktu Sekarang ---
+        // --- EXPORT & TIME ---
         function getTimestamp() {
             const now = new Date();
-            const date = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
-            const time = now.getHours().toString().padStart(2, '0') + "-" + 
-                        now.getMinutes().toString().padStart(2, '0'); // Format: HH-mm
-            return date + "_" + time;
+            return now.toISOString().split('T')[0] + "_" + 
+                now.getHours().toString().padStart(2, '0') + "-" + 
+                now.getMinutes().toString().padStart(2, '0');
         }
 
-        // --- Update Fungsi Download PDF ---
+        function prepareForExport(isExporting) {
+            const container = document.getElementById('printableArea');
+            const dateSpan = document.getElementById('printDate');
+            document.querySelectorAll('.aksi-col').forEach(el => el.style.display = isExporting ? 'none' : '');
+            container.classList.toggle('print-mode', isExporting);
+            dateSpan.innerText = isExporting ? new Date().toLocaleString('id-ID') : "";
+        }
+
         function downloadPDF() {
             prepareForExport(true);
-            
-            // Memberi sedikit jeda agar browser sempat merender tampilan sebelum print dialog muncul
-            setTimeout(() => {
-                window.print();
-                prepareForExport(false);
-            }, 500);
+            setTimeout(() => { window.print(); prepareForExport(false); }, 500);
         }
 
-        // --- Update Fungsi Download PNG ---
         function downloadPNG() {
             prepareForExport(true);
-            const element = document.getElementById('printableArea');
             const nama = document.getElementById("namaMahasiswa").value || 'Mahasiswa';
-            const waktu = getTimestamp();
-            
-            html2canvas(element, { scale: 2 }).then(canvas => {
+            html2canvas(document.getElementById('printableArea'), { scale: 2 }).then(canvas => {
                 let link = document.createElement('a');
-                link.download = `Simulasi_KHS_${nama}_${waktu}.png`; // Nama file baru
+                link.download = `Simulasi_KHS_${nama}_${getTimestamp()}.png`;
                 link.href = canvas.toDataURL();
                 link.click();
                 prepareForExport(false);
             });
         }
 
-        window.onload = function() {
-            addRow(); addRow(); addRow();
-        };
+        // Jalankan saat halaman dibuka
+        window.onload = loadData;
     </script>
 </body>
 </html>

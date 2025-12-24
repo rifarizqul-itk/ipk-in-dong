@@ -169,6 +169,33 @@ input[type="text"], input[type="number"], select {
     border-top: 2px dashed #ccc;
 }
 
+/* --- RESPONSIVE DESIGN --- */
+@media screen and (max-width: 600px) {
+    .container {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .info-box {
+        gap: 15px;
+    }
+
+    .input-group, .name-input {
+        width: 100%; /* Inputan melebar penuh di layar kecil */
+    }
+
+    .summary-table {
+        width: 100%; /* Tabel IPS/IPK jadi lebar penuh di HP */
+    }
+
+    /* Tabel utama agar bisa di-scroll secara horizontal jika kolom terlalu banyak */
+    #nilaiTable {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+}
+
 /* Kode ini hanya aktif saat user mencetak atau menyimpan sebagai PDF */
 @media print {
     /* Sembunyikan header, control bar, dan tombol tambah MK */
