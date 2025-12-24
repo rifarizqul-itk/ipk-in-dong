@@ -25,8 +25,28 @@ body {
 
 /* Area Tombol Kontrol Utama (Tidak ikut di-print) */
 .control-bar {
-    text-align: right;
+    display: flex;
+    justify-content: space-between; /* Memisahkan elemen ke ujung kiri dan kanan */
+    align-items: center;
     padding: 10px 20px 0;
+}
+
+.export-group {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Jarak antar tombol export */
+}
+
+.export-group label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+}
+
+.export-group input[type="checkbox"] {
+    width: auto; /* Agar tidak mengikuti style input lebar 100% */
+    cursor: pointer;
 }
 
 /* Main Content */
@@ -198,12 +218,102 @@ input[type="text"], input[type="number"], select {
 
 /* Kode ini hanya aktif saat user mencetak atau menyimpan sebagai PDF */
 @media print {
-    /* Sembunyikan header, control bar, dan tombol tambah MK */
+    /* 1. Paksa browser menampilkan warna latar belakang dan elemen grafik */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* 2. Sembunyikan elemen yang tidak perlu dicetak */
     .header, 
     .control-bar, 
     #btnAddRow, 
     .btn-reset,
-    .aksi-col {
+    .aksi-col,
+    .btn-guide {
         display: none !important;
     }
+
+    /* 3. Pastikan Container melebar penuh tanpa shadow */
+    .container {
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: none !important;
+        border-top: none !important;
+    }
+
+    /* 4. Pertegas Border Tabel agar tidak hilang/samar */
+    table, th, td {
+        border: 1px solid #000 !important; /* Gunakan hitam pekat agar tajam di PDF */
+    }
+
+    th {
+        background-color: #e0e0e0 !important; /* Paksa warna header tabel muncul */
+    }
+
+    /* 5. Atur tampilan input agar terlihat bersih tapi tetap rapi */
+    input, select {
+        border: none !important;
+        background: transparent !important;
+        color: #000 !important;
+    }
+
+    /* Menghilangkan header/footer otomatis dari browser (seperti URL dan Tanggal di pojok) */
+    @page {
+        margin: 1cm;
+    }
+}
+
+/* --- MODAL GUIDE --- */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0,0,0,0.5); 
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.close-guide {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close-guide:hover {
+    color: black;
+}
+
+.guide-body h4 {
+    color: #4a8bc2;
+    margin-bottom: 5px;
+}
+
+.guide-body p {
+    font-size: 13px;
+    line-height: 1.6;
+    margin-top: 0;
+}
+
+/* Tombol Panduan di Navbar/Control Bar */
+.btn-guide {
+    background-color: #f39c12;
+    color: white;
 }

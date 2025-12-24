@@ -17,13 +17,21 @@
     </div>
 
     <div class="control-bar">
-        <span>Export Hasil: </span>
-        <button class="btn btn-pdf" onclick="downloadPDF()">PDF</button>
-        <button class="btn btn-png" onclick="downloadPNG()">Gambar (PNG)</button>
+        <button class="btn btn-guide" onclick="toggleGuide(true)">Panduan Penggunaan</button>
+        
+        <div class="export-group">
+            <span style="font-size: 13px; font-weight: bold;">Sertakan dalam ekspor:</span>
+            <label style="font-size: 13px; cursor: pointer;"><input type="checkbox" id="includeIPS" checked> IPS</label>
+            <label style="font-size: 13px; cursor: pointer; margin-right: 15px;"><input type="checkbox" id="includeIPK" checked> IPK</label>
+            
+            <span>Export: </span>
+            <button class="btn btn-pdf" onclick="downloadPDF()">PDF</button>
+            <button class="btn btn-png" onclick="downloadPNG()">PNG</button>
+        </div>
     </div>
 
     <div class="container" id="printableArea">
-        <div class="section-title">Hitung Estimasi IPS (Indeks Prestasi Semester)</div>
+        <div class="section-title">Estimasi IPS (Indeks Prestasi Semester)</div>
         
         <div class="info-box">
             <div class="input-group">
@@ -40,11 +48,10 @@
         <table id="nilaiTable">
             <thead>
                 <tr>
-                    <th style="width: 15%;">Kode MK</th>
-                    <th style="width: 40%;">Mata Kuliah</th>
-                    <th style="width: 10%;">SKS</th>
+                    <th style="width: 50%;">Mata Kuliah</th>
+                    <th style="width: 15%;">SKS</th>
                     <th style="width: 15%;">N. Huruf</th>
-                    <th style="width: 10%;">S*N</th>
+                    <th style="width: 15%;">S*N</th>
                     <th style="width: 5%;" class="aksi-col">Aksi</th>
                 </tr>
             </thead>
@@ -67,7 +74,7 @@
         </table>
 
         <div class="history-section">
-            <h3>Hitung Estimasi IPK (Indeks Prestasi Kumulatif)</h3>
+            <h3>Estimasi IPK (Indeks Prestasi Kumulatif)</h3>
             <p id="helperText" style="font-size: 12px; color: #666;" data-html2canvas-ignore="true">
                 Isi bagian ini jika kamu ingin menggabungkan nilai semester ini dengan semester sebelumnya.
             </p>
@@ -96,8 +103,40 @@
         </div>
     </div>
 
+    <div id="guideModal" class="modal">
+        <div class="modal-content">
+            <span class="close-guide" onclick="toggleGuide(false)">&times;</span>
+            <h2 style="color: #4a8bc2;">Panduan IPK-in dong!</h2>
+            <div class="guide-body">
+                <h4>Apa itu SKS?</h4>
+                <p>Satuan Kredit Semester (SKS) adalah bobot beban studi tiap mata kuliah. Biasanya berkisar antara 2 sampai 4 SKS.</p>
+                
+                <h4>Apa itu S*N?</h4>
+                <p>S*N adalah hasil perkalian antara jumlah <b>SKS</b> dengan <b>Nilai Angka</b> dari huruf yang didapat (contoh: A=4.0, B=3.0).</p>
+                
+                <h4>Bagaimana IPS dihitung?</h4>
+                <p>IPS (Indeks Prestasi Semester) dihitung dengan membagi <b>Total S*N</b> dengan <b>Total SKS</b> yang diambil pada semester tersebut.</p>
+                
+                <h4>Apa bedanya dengan IPK?</h4>
+                <p>IPK (Indeks Prestasi Kumulatif) adalah rata-rata gabungan dari seluruh semester yang telah ditempuh. Di web ini, kamu bisa memasukkan data semester lalu untuk melihat proyeksi nilai akhirmu.</p>
+            </div>
+        </div>
+    </div>
+
     <script>
         const gradeValues = { "A": 4.0, "AB": 3.5, "B": 3.0, "BC": 2.5, "C": 2.0, "D": 1.0, "E": 0.0 };
+
+        function toggleGuide(show) {
+            document.getElementById("guideModal").style.display = show ? "block" : "none";
+        }
+
+        // Menutup modal jika user klik di luar kotak modal
+        window.onclick = function(event) {
+            const modal = document.getElementById("guideModal");
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
 
         // --- FUNGSI LOCAL STORAGE ---
         function saveData() {
@@ -106,10 +145,9 @@
 
             for (let i = 0; i < rows.length; i++) {
                 courses.push({
-                    kode: rows[i].cells[0].querySelector('input').value,
-                    nama: rows[i].cells[1].querySelector('input').value,
-                    sks: rows[i].cells[2].querySelector('input').value,
-                    grade: rows[i].cells[3].querySelector('select').value
+                    nama: rows[i].cells[0].querySelector('input').value,
+                    sks: rows[i].cells[1].querySelector('input').value,
+                    grade: rows[i].cells[2].querySelector('select').value
                 });
             }
 
@@ -143,7 +181,8 @@
 
             if (data.courses && data.courses.length > 0) {
                 data.courses.forEach(c => {
-                    addRow(c.kode, c.nama, c.sks, c.grade);
+                    const mataKuliah = c.nama || c.kode || ""; // Backward compatibility: isi nama dengan kode jika ada
+                    addRow(mataKuliah, c.sks, c.grade);
                 });
             } else {
                 addRow(); addRow(); addRow();
@@ -152,13 +191,12 @@
         }
 
         // --- LOGIKA UTAMA ---
-        function addRow(kode = "", nama = "", sks = 3, grade = "") {
+        function addRow(nama = "", sks = 3, grade = "") {
             const table = document.getElementById("nilaiTable").getElementsByTagName('tbody')[0];
             const newRow = table.insertRow();
 
-            newRow.insertCell(0).innerHTML = `<input type="text" placeholder="Kode MK" value="${kode}" oninput="saveData()">`;
-            newRow.insertCell(1).innerHTML = `<input type="text" placeholder="Nama Mata Kuliah" value="${nama}" oninput="saveData()">`;
-            newRow.insertCell(2).innerHTML = `<input type="number" class="sks-input" value="${sks}" min="1" oninput="calculateRow(this)">`;
+            newRow.insertCell(0).innerHTML = `<input type="text" placeholder="Nama Mata Kuliah" value="${nama}" oninput="saveData()">`;
+            newRow.insertCell(1).innerHTML = `<input type="number" class="sks-input" value="${sks}" min="1" oninput="calculateRow(this)">`;
             
             let selectHTML = `<select onchange="calculateRow(this)">`;
             selectHTML += `<option value="">- Pilih -</option>`;
@@ -167,11 +205,11 @@
                 selectHTML += `<option value="${g}" ${selected}>${g}</option>`;
             }
             selectHTML += `</select>`;
-            newRow.insertCell(3).innerHTML = selectHTML;
+            newRow.insertCell(2).innerHTML = selectHTML;
 
-            newRow.insertCell(4).innerHTML = `<input type="text" class="sn-input" readonly value="0">`;
+            newRow.insertCell(3).innerHTML = `<input type="text" class="sn-input" readonly value="0">`;
             
-            let cellAksi = newRow.insertCell(5);
+            let cellAksi = newRow.insertCell(4);
             cellAksi.className = "aksi-col";
             cellAksi.innerHTML = `<button class="btn btn-del" onclick="removeRow(this)">X</button>`;
             
@@ -243,9 +281,43 @@
         function prepareForExport(isExporting) {
             const container = document.getElementById('printableArea');
             const dateSpan = document.getElementById('printDate');
-            document.querySelectorAll('.aksi-col').forEach(el => el.style.display = isExporting ? 'none' : '');
-            container.classList.toggle('print-mode', isExporting);
-            dateSpan.innerText = isExporting ? new Date().toLocaleString('id-ID') : "";
+            
+            // Elemen-elemen yang bisa dipilih
+            const ipsTable = document.getElementById('nilaiTable');
+            const ipsSummary = document.querySelector('.summary-table'); // Ringkasan IPS yang pertama
+            const ipsTitle = document.querySelector('.section-title');
+            const ipkSection = document.querySelector('.history-section');
+            
+            // Status Checkbox
+            const showIPS = document.getElementById('includeIPS').checked;
+            const showIPK = document.getElementById('includeIPK').checked;
+
+            if (isExporting) {
+                // Sembunyikan kolom aksi
+                document.querySelectorAll('.aksi-col').forEach(el => el.style.display = 'none');
+                container.classList.add('print-mode');
+                dateSpan.innerText = new Date().toLocaleString('id-ID');
+
+                // Logika Sembunyikan/Tampilkan bagian berdasarkan pilihan
+                if (!showIPS) {
+                    ipsTable.style.display = 'none';
+                    ipsSummary.style.display = 'none';
+                    ipsTitle.style.display = 'none';
+                }
+                if (!showIPK) {
+                    ipkSection.style.display = 'none';
+                }
+            } else {
+                // Kembalikan semua ke tampilan normal di web
+                document.querySelectorAll('.aksi-col').forEach(el => el.style.display = '');
+                container.classList.remove('print-mode');
+                dateSpan.innerText = "";
+                
+                ipsTable.style.display = '';
+                ipsSummary.style.display = '';
+                ipsTitle.style.display = '';
+                ipkSection.style.display = '';
+            }
         }
 
         function downloadPDF() {
