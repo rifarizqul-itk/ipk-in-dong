@@ -168,3 +168,15 @@ input[type="text"], input[type="number"], select {
     padding-top: 20px;
     border-top: 2px dashed #ccc;
 }
+
+/* Kode ini hanya aktif saat user mencetak atau menyimpan sebagai PDF */
+@media print {
+    /* Sembunyikan header, control bar, dan tombol tambah MK */
+    .header, 
+    .control-bar, 
+    #btnAddRow, 
+    .btn-reset,
+    .aksi-col {
+        display: none !important;
+    }
+}

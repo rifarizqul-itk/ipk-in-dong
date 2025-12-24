@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIAKAD - Simulasi Hitung IPS & IPK</title>
+    <title>IPK-in dong!</title>
     
     <link rel="stylesheet" href="style.css">
 
@@ -93,7 +93,7 @@
         </div>
         
         <div style="margin-top: 30px; font-size: 10px; color: #999; text-align: center;">
-            Dicetak dari Simulasi Siakad pada: <span id="printDate"></span>
+            Dicetak dari <i>IPK-in dong!</i> pada: <span id="printDate"></span>
         </div>
     </div>
 
@@ -216,25 +216,36 @@
             }
         }
 
-        function downloadPDF() {
-            prepareForExport(true);
-            const element = document.getElementById('printableArea');
-            const opt = {
-                margin: 10,
-                filename: 'Simulasi_KHS_' + (document.getElementById("namaMahasiswa").value || 'Mahasiswa') + '.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-            html2pdf().set(opt).from(element).save().then(() => prepareForExport(false));
+        // --- Fungsi Pembantu untuk Mendapatkan Waktu Sekarang ---
+        function getTimestamp() {
+            const now = new Date();
+            const date = now.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+            const time = now.getHours().toString().padStart(2, '0') + "-" + 
+                        now.getMinutes().toString().padStart(2, '0'); // Format: HH-mm
+            return date + "_" + time;
         }
 
+        // --- Update Fungsi Download PDF ---
+        function downloadPDF() {
+            prepareForExport(true);
+            
+            // Memberi sedikit jeda agar browser sempat merender tampilan sebelum print dialog muncul
+            setTimeout(() => {
+                window.print();
+                prepareForExport(false);
+            }, 500);
+        }
+
+        // --- Update Fungsi Download PNG ---
         function downloadPNG() {
             prepareForExport(true);
             const element = document.getElementById('printableArea');
+            const nama = document.getElementById("namaMahasiswa").value || 'Mahasiswa';
+            const waktu = getTimestamp();
+            
             html2canvas(element, { scale: 2 }).then(canvas => {
                 let link = document.createElement('a');
-                link.download = 'Simulasi_KHS_' + (document.getElementById("namaMahasiswa").value || 'Mahasiswa') + '.png';
+                link.download = `Simulasi_KHS_${nama}_${waktu}.png`; // Nama file baru
                 link.href = canvas.toDataURL();
                 link.click();
                 prepareForExport(false);
