@@ -1,9 +1,9 @@
 # IPK-in dong! 
 
-**IPK-in dong!** adalah aplikasi berbasis web sederhana yang dirancang untuk membantu mahasiswa Institut Teknologi Kalimantan melakukan simulasi perhitungan Indeks Prestasi Semester (IPS) dan Indeks Prestasi Kumulatif (IPK).
+**IPK-in dong!** adalah web sederhana untuk membantu mahasiswa Institut Teknologi Kalimantan melakukan perhitungan Indeks Prestasi Semester (IPS) dan Indeks Prestasi Kumulatif (IPK).
 
 ## Fitur Utama
-* **Simulasi IPS & IPK:** Hitung estimasi nilai semester berjalan dan gabungkan dengan nilai semester sebelumnya untuk melihat proyeksi IPK.
+* **Hitung IPS & IPK:** Hitung estimasi nilai semester berjalan dan gabungkan dengan nilai semester sebelumnya untuk melihat proyeksi IPK.
 * **Auto-Save (Local Storage):** Data yang kamu input otomatis tersimpan di browser. Tidak perlu takut data hilang saat halaman di-refresh atau ditutup.
 * **Export PDF & PNG:** Unduh hasil simulasi dalam format PDF atau PNG (gambar) untuk arsip pribadi atau dibagikan.
 * **Privacy Focused:** Semua perhitungan dilakukan di sisi klien (browser pengguna). Tidak ada data yang dikirim ke server luar.
